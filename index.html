@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Teachers' Day! 🌟 — NPS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root { --gold:#FFD93D; --coral:#FF6B6B; --mint:#6BCB77; --sky:#4D96FF; --purple:#C77DFF; --bg:#FFF8ED; --card:#FFFFFF; --text:#2D2D2D; --sub:#666; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Nunito Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    .hero { background:linear-gradient(135deg,#FFD93D 0%,#FF6B6B 50%,#C77DFF 100%); padding:40px 20px 50px; text-align:center; position:relative; overflow:hidden; }
+    .hero::before { content:"⭐🌸⭐🌸⭐🌸⭐🌸⭐🌸⭐"; position:absolute; top:8px; left:0; right:0; font-size:20px; letter-spacing:4px; opacity:.35; }
+    .hero h1 { font-family:'Nunito',sans-serif; font-size:clamp(2rem,6vw,3.5rem); font-weight:900; color:#fff; text-shadow:0 3px 0 rgba(0,0,0,.15); line-height:1.15; }
+    .hero p { margin-top:12px; font-size:clamp(1rem,3vw,1.25rem); color:rgba(255,255,255,.92); font-weight:600; }
+    .wave { display:block; width:100%; height:48px; background:var(--bg); clip-path:ellipse(55% 100% at 50% 100%); margin-top:-2px; }
+    .instruction { text-align:center; padding:6px 20px 24px; font-size:clamp(1rem,3vw,1.15rem); color:var(--sub); font-weight:600; }
+    .instruction strong { color:var(--coral); }
+    .search-wrap { max-width:480px; margin:0 auto 28px; padding:0 16px; }
+    .search-wrap input { width:100%; padding:14px 20px; font-size:1.1rem; font-family:'Nunito Sans',sans-serif; border:3px solid var(--gold); border-radius:50px; outline:none; background:#fff; color:var(--text); transition:border-color .2s; }
+    .search-wrap input:focus { border-color:var(--coral); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:16px; max-width:960px; margin:0 auto; padding:0 16px 60px; }
+    .card { background:var(--card); border-radius:20px; padding:24px 12px 20px; text-align:center; cursor:pointer; text-decoration:none; color:inherit; box-shadow:0 4px 0 rgba(0,0,0,.07); border:3px solid transparent; transition:transform .15s,border-color .15s,box-shadow .15s; display:flex; flex-direction:column; align-items:center; gap:10px; }
+    .card:hover,.card:focus { transform:translateY(-5px); border-color:var(--gold); box-shadow:0 8px 0 rgba(0,0,0,.1); outline:none; }
+    .card:active { transform:translateY(-2px); }
+    .card-emoji { width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.2rem; }
+    .card:nth-child(5n+1) .card-emoji { background:#FFF0C2; }
+    .card:nth-child(5n+2) .card-emoji { background:#FFE0E0; }
+    .card:nth-child(5n+3) .card-emoji { background:#D6F5DA; }
+    .card:nth-child(5n+4) .card-emoji { background:#D6E8FF; }
+    .card:nth-child(5n+5) .card-emoji { background:#EDD6FF; }
+    .card-name { font-family:'Nunito',sans-serif; font-weight:900; font-size:.95rem; line-height:1.2; }
+    .card-class { font-size:.78rem; color:var(--sub); font-weight:600; }
+    .card-btn { margin-top:4px; padding:6px 14px; border-radius:50px; background:var(--gold); font-size:.78rem; font-family:'Nunito',sans-serif; font-weight:700; color:#333; }
+    .empty { text-align:center; padding:40px; color:var(--sub); font-size:1.1rem; display:none; }
+    footer { text-align:center; padding:20px; font-size:.85rem; color:#aaa; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>Happy Teachers' Day! 🌟</h1>
+    <p>Choose your teacher and leave a message of appreciation 💛</p>
+  </div>
+  <span class="wave"></span>
+  <p class="instruction">👇 Tap on your <strong>teacher's name</strong> below!</p>
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="🔍  Search teacher name or class…" aria-label="Search teachers" />
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty">No teachers found. Try a different name! 🤔</p>
+  <footer>Made with ❤️ for Teachers' Day — NPS</footer>
+<script>
+const TEACHERS = [
+  { id: "mdm-p-nirija", name: "Mdm P Nirija", formClass: "1A", emoji: "📝" },
+  { id: "mrs-poh-kexin", name: "Mrs Poh Kexin", formClass: "1B", emoji: "📚" },
+  { id: "mrs-see-foo-hui-shan", name: "Mrs See-Foo Hui Shan", formClass: "1A", emoji: "📚" },
+  { id: "miss-chua-pei-ying", name: "Miss Chua Pei Ying", formClass: "1B", emoji: "📝" },
+  { id: "miss-yu-xinyi", name: "Miss Yu Xinyi", formClass: "1B", emoji: "📝" },
+  { id: "mdm-nur-hasimah-abdul-rahman", name: "Mdm Nur Hasimah Abdul Rahman", formClass: "1C", emoji: "📚" },
+  { id: "miss-vivian-phang", name: "Miss Vivian Phang", formClass: "1C", emoji: "📝" },
+  { id: "mrs-jilyn-tan", name: "Mrs Jilyn Tan", formClass: "1D", emoji: "📚" },
+  { id: "mdm-siti-rosmala-rahmat", name: "Mdm Siti Rosmala Rahmat", formClass: "1D", emoji: "📝" },
+  { id: "mrs-chong-cheng-cheng", name: "Mrs Chong Cheng Cheng", formClass: "1E", emoji: "📐" },
+  { id: "mdm-chua-siew-beng", name: "Mdm Chua Siew Beng", formClass: "1E", emoji: "📝" },
+  { id: "ms-hidaya", name: "Ms Hidaya", formClass: "1E", emoji: "👩‍🏫" },
+  { id: "miss-hiswary", name: "Miss Hiswary", formClass: "1F", emoji: "🎨" },
+  { id: "mdm-suritha", name: "Mdm Suritha", formClass: "1F", emoji: "📚" },
+  { id: "mdm-menhanah-masudi", name: "Mdm Menhanah Masudi", formClass: "1G", emoji: "📚" },
+  { id: "mr-tan-chin-huat-joshua", name: "Mr Tan Chin Huat (Joshua)", formClass: "1G", emoji: "📝" },
+  { id: "mdm-angrini", name: "Mdm Angrini", formClass: "1H", emoji: "📚" },
+  { id: "mdm-fauzani", name: "Mdm Fauzani", formClass: "1H", emoji: "📝" },
+  { id: "mrs-goh-xin-hwei", name: "Mrs Goh Xin Hwei", formClass: "", emoji: "✏️" },
+  { id: "mdm-sarina", name: "Mdm Sarina", formClass: "4A", emoji: "📚" },
+  { id: "mdm-pauline-cheong", name: "Mdm Pauline Cheong", formClass: "2H", emoji: "📚" },
+  { id: "miss-soh-wan-hong", name: "Miss Soh Wan Hong", formClass: "2A", emoji: "🎨" },
+  { id: "mdm-siti-hajar-bujang", name: "Mdm Siti Hajar Bujang", formClass: "2A", emoji: "📝" },
+  { id: "mrs-abigail-ng", name: "Mrs Abigail Ng", formClass: "2A", emoji: "📚" },
+  { id: "mrs-tham-wan-churn", name: "Mrs Tham Wan Churn", formClass: "2B", emoji: "📚" },
+  { id: "miss-ong-teck-lian", name: "Miss Ong Teck Lian", formClass: "2B", emoji: "📝" },
+  { id: "mrs-joyce-lau", name: "Mrs Joyce Lau", formClass: "2B", emoji: "📝" },
+  { id: "mrs-ho-chan-hui-lin", name: "Mrs Ho-Chan Hui Lin", formClass: "2C", emoji: "📚" },
+  { id: "ms-cheng-zheng-yi", name: "Ms Cheng Zheng Yi", formClass: "2C", emoji: "🎵" },
+  { id: "ms-pan-xiuyan-dini", name: "Ms Pan Xiuyan Dini", formClass: "2C", emoji: "📝" },
+  { id: "mrs-cindy-seah", name: "Mrs Cindy Seah", formClass: "2D", emoji: "📚" },
+  { id: "mdm-guo-guiqing", name: "Mdm Guo Guiqing", formClass: "2D", emoji: "📝" },
+  { id: "mrs-lily-chua", name: "Mrs Lily Chua", formClass: "2D", emoji: "📖" },
+  { id: "ms-shiamala-krishna-kumar", name: "Ms Shiamala Krishna Kumar", formClass: "2E", emoji: "📚" },
+  { id: "mr-zheng-junren", name: "Mr Zheng Junren", formClass: "2E", emoji: "📝" },
+  { id: "mrs-tan-lee-joon", name: "Mrs Tan Lee Joon", formClass: "2F", emoji: "📚" },
+  { id: "mdm-yang-yang", name: "Mdm Yang Yang", formClass: "2F", emoji: "📝" },
+  { id: "mrs-jessie-ang", name: "Mrs Jessie Ang", formClass: "2F", emoji: "✏️" },
+  { id: "mdm-normaliza-jaafar", name: "Mdm Normaliza Jaafar", formClass: "2G", emoji: "✏️" },
+  { id: "mdm-yap-siok-mei", name: "Mdm Yap Siok Mei", formClass: "2G", emoji: "📝" },
+  { id: "miss-joyce-tan-ee-luck", name: "Miss Joyce Tan Ee Luck", formClass: "2H", emoji: "📝" },
+  { id: "mdm-lasime-kumari", name: "Mdm Lasime Kumari", formClass: "", emoji: "📖" },
+  { id: "mrs-chitra-thirumaran", name: "Mrs Chitra Thirumaran", formClass: "3A", emoji: "📚" },
+  { id: "mrs-ellis-chua", name: "Mrs Ellis Chua", formClass: "3A", emoji: "✏️" },
+  { id: "ms-nazreen-fathima-jagabar", name: "Ms Nazreen Fathima Jagabar", formClass: "3B", emoji: "📐" },
+  { id: "mdm-cindy-heng", name: "Mdm Cindy Heng", formClass: "3B", emoji: "🎵" },
+  { id: "mdm-keerthana-maheswaran", name: "Mdm Keerthana Maheswaran", formClass: "3B", emoji: "🌍" },
+  { id: "mrs-lam-lim-shiuh-hui-jennifer", name: "Mrs Lam-Lim Shiuh Hui Jennifer", formClass: "3C", emoji: "📚" },
+  { id: "mdm-fadilah-abdul-rahim", name: "Mdm Fadilah Abdul Rahim", formClass: "3C", emoji: "📝" },
+  { id: "mr-fong-wei-jie-daniel", name: "Mr Fong Wei Jie Daniel", formClass: "3D", emoji: "⚽" },
+  { id: "mrs-melissa-tay", name: "Mrs Melissa Tay", formClass: "3D", emoji: "📚" },
+  { id: "mrs-joyce-low", name: "Mrs Joyce Low", formClass: "3D", emoji: "📝" },
+  { id: "mr-hairi", name: "Mr Hairi", formClass: "3E", emoji: "📖" },
+  { id: "mr-nigel-lim", name: "Mr Nigel Lim", formClass: "3E", emoji: "🏃" },
+  { id: "mdm-neitiyah-balkrishnan", name: "Mdm Neitiyah Balkrishnan", formClass: "3E", emoji: "📝" },
+  { id: "ms-angel-tan", name: "Ms Angel Tan", formClass: "3F", emoji: "🌍" },
+  { id: "mdm-tay-siew-buay", name: "Mdm Tay Siew Buay", formClass: "3F", emoji: "📝" },
+  { id: "mr-saravanakumar", name: "Mr Saravanakumar", formClass: "4C", emoji: "🔬" },
+  { id: "mdm-nurul-shahraini-azhar", name: "Mdm Nurul Shahraini Azhar", formClass: "4A", emoji: "🔬" },
+  { id: "mr-wilson-tan", name: "Mr Wilson Tan", formClass: "4B", emoji: "🏃" },
+  { id: "mdm-anandhi", name: "Mdm Anandhi", formClass: "4B", emoji: "📝" },
+  { id: "mrs-karen-koo", name: "Mrs Karen Koo", formClass: "4B", emoji: "📚" },
+  { id: "mdm-chen-jun", name: "Mdm Chen Jun", formClass: "4C", emoji: "✏️" },
+  { id: "ms-deepa-chandra", name: "Ms Deepa Chandra", formClass: "4C", emoji: "📚" },
+  { id: "mdm-nor-afiza-abdul-hamid", name: "Mdm Nor Afiza Abdul Hamid", formClass: "4D", emoji: "🎵" },
+  { id: "mr-ng-guan-hun", name: "Mr Ng Guan Hun", formClass: "4D", emoji: "📐" },
+  { id: "mrs-fiona-lin", name: "Mrs Fiona Lin", formClass: "4E", emoji: "🔬" },
+  { id: "mrs-lim-tan-su-xuan", name: "Mrs Lim-Tan Su Xuan", formClass: "4E", emoji: "📝" },
+  { id: "mdm-nurfaizah-ismail", name: "Mdm Nurfaizah Ismail", formClass: "4F", emoji: "📚" },
+  { id: "mr-ganesan", name: "Mr Ganesan", formClass: "4F", emoji: "⚽" },
+  { id: "ms-chan-mui-ngee", name: "Ms Chan Mui Ngee", formClass: "4F", emoji: "📖" },
+  { id: "mr-terrance-ang", name: "Mr Terrance Ang", formClass: "", emoji: "🧮" },
+  { id: "mrs-nurelyani-akel", name: "Mrs Nurelyani Akel", formClass: "5A", emoji: "📚" },
+  { id: "mdm-christine-lee", name: "Mdm Christine Lee", formClass: "5A", emoji: "📝" },
+  { id: "mr-daniel-tam", name: "Mr Daniel Tam", formClass: "5B", emoji: "🏃" },
+  { id: "ms-yuanna-salamat", name: "Ms Yuanna Salamat", formClass: "5B", emoji: "📝" },
+  { id: "mrs-prema-suresh", name: "Mrs Prema Suresh", formClass: "5C", emoji: "📐" },
+  { id: "mrs-phua-lim-javis", name: "Mrs Phua-Lim Javis", formClass: "5C", emoji: "🎨" },
+  { id: "mrs-priscilla-tay", name: "Mrs Priscilla Tay", formClass: "5C", emoji: "🎵" },
+  { id: "mr-manivanan-muthu", name: "Mr Manivanan Muthu", formClass: "5D", emoji: "🌍" },
+  { id: "mrs-lim-koh-kha-tiang", name: "Mrs Lim-Koh Kha Tiang", formClass: "5D", emoji: "📐" },
+  { id: "mrs-tan-shihui", name: "Mrs Tan Shihui", formClass: "5E", emoji: "🏃" },
+  { id: "mr-rajiv-jude-illesinghe", name: "Mr Rajiv Jude Illesinghe", formClass: "5E", emoji: "📖" },
+  { id: "mr-kumara-rajan", name: "Mr Kumara Rajan", formClass: "5E", emoji: "🌍" },
+  { id: "miss-dashni-ravindran", name: "Miss Dashni Ravindran", formClass: "5F", emoji: "📚" },
+  { id: "ms-cai-weiling", name: "Ms Cai Weiling", formClass: "5F", emoji: "📝" },
+  { id: "mr-shahrul", name: "Mr Shahrul", formClass: "6C", emoji: "📐" },
+  { id: "ms-nurshida-abdul-hamit", name: "Ms Nurshida Abdul Hamit", formClass: "6A", emoji: "📚" },
+  { id: "mrs-asmawati-ganesan", name: "Mrs Asmawati Ganesan", formClass: "6A", emoji: "🌍" },
+  { id: "mrs-joycelyn-goh", name: "Mrs Joycelyn Goh", formClass: "6A", emoji: "🔬" },
+  { id: "mdm-chan-see-yeu", name: "Mdm Chan See Yeu", formClass: "6B", emoji: "🔬" },
+  { id: "mr-faroek", name: "Mr Faroek", formClass: "6B", emoji: "⚽" },
+  { id: "mdm-kung-sok-hiang", name: "Mdm Kung Sok Hiang", formClass: "6B", emoji: "📝" },
+  { id: "mrs-lee-goy-hoon-meng", name: "Mrs Lee-Goy Hoon Meng", formClass: "6C", emoji: "📖" },
+  { id: "mr-chang-cheng-hwee", name: "Mr Chang Cheng Hwee", formClass: "6D", emoji: "📐" },
+  { id: "mdm-farah-hasinah-abdul-wahab", name: "Mdm Farah Hasinah Abdul Wahab", formClass: "6D", emoji: "📚" },
+  { id: "mrs-hans-ow", name: "Mrs Hans Ow", formClass: "6E", emoji: "📚" },
+  { id: "mr-goh-shu-rong", name: "Mr Goh Shu Rong", formClass: "6E", emoji: "📐" },
+  { id: "mrs-lee-liu-lai-feng", name: "Mrs Lee-Liu Lai Feng", formClass: "6F", emoji: "📝" },
+  { id: "mrs-katherine-chong", name: "Mrs Katherine Chong", formClass: "6F", emoji: "📚" },
+  { id: "mdm-aishah-abdul-jalil", name: "Mdm Aishah Abdul Jalil", formClass: "", emoji: "✏️" },
+  { id: "mr-michael-long", name: "Mr Michael Long", formClass: "", emoji: "🔬" },
+  { id: "mdm-norlizan-ahmat", name: "Mdm Norlizan Ahmat", formClass: "", emoji: "📖" },
+  { id: "mdm-nur-hafizah-hamir", name: "Mdm Nur Hafizah Hamir", formClass: "", emoji: "🌿" },
+  { id: "mr-a-divian", name: "Mr A Divian", formClass: "", emoji: "🌿" },
+  { id: "ms-ong-ban-teng", name: "Ms Ong Ban Teng", formClass: "", emoji: "🌿" },
+  { id: "ms-rachel-chan", name: "Ms Rachel Chan", formClass: "", emoji: "🌿" },
+  { id: "mr-jay-mahardale", name: "Mr Jay Mahardale", formClass: "", emoji: "🌿" },
+  { id: "mr-chong-choong-hian", name: "Mr Chong Choong Hian", formClass: "", emoji: "🌿" },
+  { id: "mrs-gina-cho", name: "Mrs Gina Cho", formClass: "", emoji: "🌿" },
+];
+
+const grid = document.getElementById('grid');
+const empty = document.getElementById('empty');
+const search = document.getElementById('search');
+
+function render(list) {
+  grid.innerHTML = '';
+  if (!list.length) { empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.forEach(t => {
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = 'teacher.html?id=' + t.id;
+    a.innerHTML = `
+      <div class="card-emoji">${t.emoji}</div>
+      <div class="card-name">${t.name}</div>
+      ${t.formClass ? `<div class="card-class">Class ${t.formClass}</div>` : ''}
+      <div class="card-btn">Write a message ✏️</div>`;
+    grid.appendChild(a);
+  });
+}
+
+render(TEACHERS);
+search.addEventListener('input', () => {
+  const q = search.value.toLowerCase();
+  render(TEACHERS.filter(t => t.name.toLowerCase().includes(q) || (t.formClass||'').toLowerCase().includes(q)));
+});
+</script>
+</body>
+</html>
