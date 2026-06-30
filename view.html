@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Messages — NPS Teachers' Day</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&family=Nunito+Sans:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+:root { --gold:#FFD93D; --coral:#FF6B6B; --mint:#6BCB77; --sky:#4D96FF; --purple:#C77DFF; --bg:#FFF8ED; --text:#2D2D2D; --sub:#777; --card:#FFFFFF; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Nunito Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+.top-bar { background:linear-gradient(135deg,#FFD93D,#FF6B6B); padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.top-bar-title { font-family:'Nunito',sans-serif; font-weight:900; color:#fff; font-size:1.1rem; text-shadow:0 1px 0 rgba(0,0,0,.1); }
+.private-badge { text-decoration:none; background:rgba(255,255,255,.3); border-radius:50px; padding:6px 14px; font-weight:700; font-family:'Nunito',sans-serif; color:#fff; font-size:.78rem; white-space:nowrap; }
+.teacher-hero { text-align:center; padding:36px 20px 24px; }
+.teacher-avatar { width:110px; height:110px; border-radius:50%; background:#FFF0C2; display:flex; align-items:center; justify-content:center; font-size:3.5rem; margin:0 auto 16px; border:5px solid var(--gold); box-shadow:0 6px 0 rgba(0,0,0,.08); }
+.teacher-name { font-family:'Nunito',sans-serif; font-size:clamp(1.6rem,5vw,2.2rem); font-weight:900; }
+.teacher-class { color:var(--sub); font-weight:600; font-size:1rem; margin-top:4px; }
+.teacher-tagline { margin-top:14px; font-size:1.05rem; color:var(--coral); font-weight:700; }
+.lock-note { margin-top:10px; font-size:.85rem; color:var(--sub); font-weight:600; }
+.stats-bar { max-width:600px; margin:0 auto; padding:0 16px 18px; display:flex; justify-content:center; }
+.stats-pill { background:var(--card); border:2px solid #F0E8D8; border-radius:50px; padding:10px 22px; font-family:'Nunito',sans-serif; font-weight:900; font-size:1rem; color:var(--text); box-shadow:0 3px 0 rgba(0,0,0,.05); }
+.stats-pill span { color:var(--coral); }
+.section-label { text-align:center; font-family:'Nunito',sans-serif; font-weight:900; font-size:1.15rem; color:var(--text); padding:0 20px 16px; }
+.refresh-row { display:flex; justify-content:center; padding-bottom:16px; }
+.refresh-btn { background:#fff; border:2px solid var(--gold); color:var(--text); font-family:'Nunito',sans-serif; font-weight:800; font-size:.85rem; padding:8px 18px; border-radius:50px; cursor:pointer; transition:transform .1s; }
+.refresh-btn:hover { transform:translateY(-1px); }
+.refresh-btn:disabled { opacity:.6; cursor:not-allowed; }
+.comments-section { max-width:600px; margin:0 auto; padding:0 16px 60px; }
+.comments-wall { display:flex; flex-direction:column; gap:14px; max-height:620px; overflow-y:auto; padding:4px 2px 4px 0; scrollbar-width:thin; scrollbar-color:var(--gold) transparent; }
+.comments-wall::-webkit-scrollbar { width:6px; }
+.comments-wall::-webkit-scrollbar-thumb { background:var(--gold); border-radius:3px; }
+.comment-bubble { background:var(--card); border-radius:16px; padding:16px 18px; box-shadow:0 3px 0 rgba(0,0,0,.05); border-left:4px solid var(--gold); animation:popIn .3s ease; }
+@keyframes popIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.comment-bubble:nth-child(4n+2) { border-color:var(--coral); }
+.comment-bubble:nth-child(4n+3) { border-color:var(--mint); }
+.comment-bubble:nth-child(4n+4) { border-color:var(--sky); }
+.comment-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.comment-author { font-family:'Nunito',sans-serif; font-weight:900; font-size:.95rem; }
+.comment-time { font-size:.75rem; color:var(--sub); }
+.comment-text { font-size:.97rem; line-height:1.55; color:var(--text); }
+.no-comments { text-align:center; color:var(--sub); padding:30px 0; font-size:1rem; }
+.no-comments small { display:block; margin-top:6px; }
+.not-found { text-align:center; padding:60px 20px; }
+.not-found h2 { font-family:'Nunito',sans-serif; font-size:1.8rem; font-weight:900; margin-bottom:12px; }
+.loading-msg { text-align:center; color:var(--sub); padding:30px 0; font-size:1rem; }
+.footer-note { text-align:center; color:var(--sub); font-size:.8rem; padding:0 20px 30px; }
+</style>
+</head>
+<body>
+<div class="top-bar">
+<div class="top-bar-title" id="topTitle">Your Messages 💌</div>
+<div class="private-badge">🔒 Private view</div>
+</div>
+<div id="pageContent"></div>
+
+<script>
+const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
+
+const TEACHERS = [
+{ id: "mdm-p-nirija", name: "Mdm P Nirija", formClass: "1A", emoji: "📝" },
+{ id: "mrs-poh-kexin", name: "Mrs Poh Kexin", formClass: "1B", emoji: "📚" },
+{ id: "mrs-see-foo-hui-shan", name: "Mrs See-Foo Hui Shan", formClass: "1A", emoji: "📚" },
+{ id: "miss-chua-pei-ying", name: "Miss Chua Pei Ying", formClass: "1B", emoji: "📝" },
+{ id: "miss-yu-xinyi", name: "Miss Yu Xinyi", formClass: "1B", emoji: "📝" },
+{ id: "mdm-nur-hasimah-abdul-rahman", name: "Mdm Nur Hasimah Abdul Rahman", formClass: "1C", emoji: "📚" },
+{ id: "miss-vivian-phang", name: "Miss Vivian Phang", formClass: "1C", emoji: "📝" },
+{ id: "mrs-jilyn-tan", name: "Mrs Jilyn Tan", formClass: "1D", emoji: "📚" },
+{ id: "mdm-siti-rosmala-rahmat", name: "Mdm Siti Rosmala Rahmat", formClass: "1D", emoji: "📝" },
+{ id: "mrs-chong-cheng-cheng", name: "Mrs Chong Cheng Cheng", formClass: "1E", emoji: "📐" },
+{ id: "mdm-chua-siew-beng", name: "Mdm Chua Siew Beng", formClass: "1E", emoji: "📝" },
+{ id: "ms-hidaya", name: "Ms Hidaya", formClass: "1E", emoji: "👩‍🏫" },
+{ id: "miss-hiswary", name: "Miss Hiswary", formClass: "1F", emoji: "🎨" },
+{ id: "mdm-suritha", name: "Mdm Suritha", formClass: "1F", emoji: "📚" },
+{ id: "mdm-menhanah-masudi", name: "Mdm Menhanah Masudi", formClass: "1G", emoji: "📚" },
+{ id: "mr-tan-chin-huat-joshua", name: "Mr Tan Chin Huat (Joshua)", formClass: "1G", emoji: "📝" },
+{ id: "mdm-angrini", name: "Mdm Angrini", formClass: "1H", emoji: "📚" },
+{ id: "mdm-fauzani", name: "Mdm Fauzani", formClass: "1H", emoji: "📝" },
+{ id: "mrs-goh-xin-hwei", name: "Mrs Goh Xin Hwei", formClass: "", emoji: "✏️" },
+{ id: "mdm-sarina", name: "Mdm Sarina", formClass: "4A", emoji: "📚" },
+{ id: "mdm-pauline-cheong", name: "Mdm Pauline Cheong", formClass: "2H", emoji: "📚" },
+{ id: "miss-soh-wan-hong", name: "Miss Soh Wan Hong", formClass: "2A", emoji: "🎨" },
+{ id: "mdm-siti-hajar-bujang", name: "Mdm Siti Hajar Bujang", formClass: "2A", emoji: "📝" },
+{ id: "mrs-abigail-ng", name: "Mrs Abigail Ng", formClass: "2A", emoji: "📚" },
+{ id: "mrs-tham-wan-churn", name: "Mrs Tham Wan Churn", formClass: "2B", emoji: "📚" },
+{ id: "miss-ong-teck-lian", name: "Miss Ong Teck Lian", formClass: "2B", emoji: "📝" },
+{ id: "mrs-joyce-lau", name: "Mrs Joyce Lau", formClass: "2B", emoji: "📝" },
+{ id: "mrs-ho-chan-hui-lin", name: "Mrs Ho-Chan Hui Lin", formClass: "2C", emoji: "📚" },
+{ id: "ms-cheng-zheng-yi", name: "Ms Cheng Zheng Yi", formClass: "2C", emoji: "🎵" },
+{ id: "ms-pan-xiuyan-dini", name: "Ms Pan Xiuyan Dini", formClass: "2C", emoji: "📝" },
+{ id: "mrs-cindy-seah", name: "Mrs Cindy Seah", formClass: "2D", emoji: "📚" },
+{ id: "mdm-guo-guiqing", name: "Mdm Guo Guiqing", formClass: "2D", emoji: "📝" },
+{ id: "mrs-lily-chua", name: "Mrs Lily Chua", formClass: "2D", emoji: "📖" },
+{ id: "ms-shiamala-krishna-kumar", name: "Ms Shiamala Krishna Kumar", formClass: "2E", emoji: "📚" },
+{ id: "mr-zheng-junren", name: "Mr Zheng Junren", formClass: "2E", emoji: "📝" },
+{ id: "mrs-tan-lee-joon", name: "Mrs Tan Lee Joon", formClass: "2F", emoji: "📚" },
+{ id: "mdm-yang-yang", name: "Mdm Yang Yang", formClass: "2F", emoji: "📝" },
+{ id: "mrs-jessie-ang", name: "Mrs Jessie Ang", formClass: "2F", emoji: "✏️" },
+{ id: "mdm-normaliza-jaafar", name: "Mdm Normaliza Jaafar", formClass: "2G", emoji: "✏️" },
+{ id: "mdm-yap-siok-mei", name: "Mdm Yap Siok Mei", formClass: "2G", emoji: "📝" },
+{ id: "miss-joyce-tan-ee-luck", name: "Miss Joyce Tan Ee Luck", formClass: "2H", emoji: "📝" },
+{ id: "mdm-lasime-kumari", name: "Mdm Lasime Kumari", formClass: "", emoji: "📖" },
+{ id: "mrs-chitra-thirumaran", name: "Mrs Chitra Thirumaran", formClass: "3A", emoji: "📚" },
+{ id: "mrs-ellis-chua", name: "Mrs Ellis Chua", formClass: "3A", emoji: "✏️" },
+{ id: "ms-nazreen-fathima-jagabar", name: "Ms Nazreen Fathima Jagabar", formClass: "3B", emoji: "📐" },
+{ id: "mdm-cindy-heng", name: "Mdm Cindy Heng", formClass: "3B", emoji: "🎵" },
+{ id: "mdm-keerthana-maheswaran", name: "Mdm Keerthana Maheswaran", formClass: "3B", emoji: "🌍" },
+{ id: "mrs-lam-lim-shiuh-hui-jennifer", name: "Mrs Lam-Lim Shiuh Hui Jennifer", formClass: "3C", emoji: "📚" },
+{ id: "mdm-fadilah-abdul-rahim", name: "Mdm Fadilah Abdul Rahim", formClass: "3C", emoji: "📝" },
+{ id: "mr-fong-wei-jie-daniel", name: "Mr Fong Wei Jie Daniel", formClass: "3D", emoji: "⚽" },
+{ id: "mrs-melissa-tay", name: "Mrs Melissa Tay", formClass: "3D", emoji: "📚" },
+{ id: "mrs-joyce-low", name: "Mrs Joyce Low", formClass: "3D", emoji: "📝" },
+{ id: "mr-hairi", name: "Mr Hairi", formClass: "3E", emoji: "📖" },
+{ id: "mr-nigel-lim", name: "Mr Nigel Lim", formClass: "3E", emoji: "🏃" },
+{ id: "mdm-neitiyah-balkrishnan", name: "Mdm Neitiyah Balkrishnan", formClass: "3E", emoji: "📝" },
+{ id: "ms-angel-tan", name: "Ms Angel Tan", formClass: "3F", emoji: "🌍" },
+{ id: "mdm-tay-siew-buay", name: "Mdm Tay Siew Buay", formClass: "3F", emoji: "📝" },
+{ id: "mr-saravanakumar", name: "Mr Saravanakumar", formClass: "4C", emoji: "🔬" },
+{ id: "mdm-nurul-shahraini-azhar", name: "Mdm Nurul Shahraini Azhar", formClass: "4A", emoji: "🔬" },
+{ id: "mr-wilson-tan", name: "Mr Wilson Tan", formClass: "4B", emoji: "🏃" },
+{ id: "mdm-anandhi", name: "Mdm Anandhi", formClass: "4B", emoji: "📝" },
+{ id: "mrs-karen-koo", name: "Mrs Karen Koo", formClass: "4B", emoji: "📚" },
+{ id: "mdm-chen-jun", name: "Mdm Chen Jun", formClass: "4C", emoji: "✏️" },
+{ id: "ms-deepa-chandra", name: "Ms Deepa Chandra", formClass: "4C", emoji: "📚" },
+{ id: "mdm-nor-afiza-abdul-hamid", name: "Mdm Nor Afiza Abdul Hamid", formClass: "4D", emoji: "🎵" },
+{ id: "mr-ng-guan-hun", name: "Mr Ng Guan Hun", formClass: "4D", emoji: "📐" },
+{ id: "mrs-fiona-lin", name: "Mrs Fiona Lin", formClass: "4E", emoji: "🔬" },
+{ id: "mrs-lim-tan-su-xuan", name: "Mrs Lim-Tan Su Xuan", formClass: "4E", emoji: "📝" },
+{ id: "mdm-nurfaizah-ismail", name: "Mdm Nurfaizah Ismail", formClass: "4F", emoji: "📚" },
+{ id: "mr-ganesan", name: "Mr Ganesan", formClass: "4F", emoji: "⚽" },
+{ id: "ms-chan-mui-ngee", name: "Ms Chan Mui Ngee", formClass: "4F", emoji: "📖" },
+{ id: "mr-terrance-ang", name: "Mr Terrance Ang", formClass: "", emoji: "🧮" },
+{ id: "mrs-nurelyani-akel", name: "Mrs Nurelyani Akel", formClass: "5A", emoji: "📚" },
+{ id: "mdm-christine-lee", name: "Mdm Christine Lee", formClass: "5A", emoji: "📝" },
+{ id: "mr-daniel-tam", name: "Mr Daniel Tam", formClass: "5B", emoji: "🏃" },
+{ id: "ms-yuanna-salamat", name: "Ms Yuanna Salamat", formClass: "5B", emoji: "📝" },
+{ id: "mrs-prema-suresh", name: "Mrs Prema Suresh", formClass: "5C", emoji: "📐" },
+{ id: "mrs-phua-lim-javis", name: "Mrs Phua-Lim Javis", formClass: "5C", emoji: "🎨" },
+{ id: "mrs-priscilla-tay", name: "Mrs Priscilla Tay", formClass: "5C", emoji: "🎵" },
+{ id: "mr-manivanan-muthu", name: "Mr Manivanan Muthu", formClass: "5D", emoji: "🌍" },
+{ id: "mrs-lim-koh-kha-tiang", name: "Mrs Lim-Koh Kha Tiang", formClass: "5D", emoji: "📐" },
+{ id: "mrs-tan-shihui", name: "Mrs Tan Shihui", formClass: "5E", emoji: "🏃" },
+{ id: "mr-rajiv-jude-illesinghe", name: "Mr Rajiv Jude Illesinghe", formClass: "5E", emoji: "📖" },
+{ id: "mr-kumara-rajan", name: "Mr Kumara Rajan", formClass: "5E", emoji: "🌍" },
+{ id: "miss-dashni-ravindran", name: "Miss Dashni Ravindran", formClass: "5F", emoji: "📚" },
+{ id: "ms-cai-weiling", name: "Ms Cai Weiling", formClass: "5F", emoji: "📝" },
+{ id: "mr-shahrul", name: "Mr Shahrul", formClass: "6C", emoji: "📐" },
+{ id: "ms-nurshida-abdul-hamit", name: "Ms Nurshida Abdul Hamit", formClass: "6A", emoji: "📚" },
+{ id: "mrs-asmawati-ganesan", name: "Mrs Asmawati Ganesan", formClass: "6A", emoji: "🌍" },
+{ id: "mrs-joycelyn-goh", name: "Mrs Joycelyn Goh", formClass: "6A", emoji: "🔬" },
+{ id: "mdm-chan-see-yeu", name: "Mdm Chan See Yeu", formClass: "6B", emoji: "🔬" },
+{ id: "mr-faroek", name: "Mr Faroek", formClass: "6B", emoji: "⚽" },
+{ id: "mdm-kung-sok-hiang", name: "Mdm Kung Sok Hiang", formClass: "6B", emoji: "📝" },
+{ id: "mrs-lee-goy-hoon-meng", name: "Mrs Lee-Goy Hoon Meng", formClass: "6C", emoji: "📖" },
+{ id: "mr-chang-cheng-hwee", name: "Mr Chang Cheng Hwee", formClass: "6D", emoji: "📐" },
+{ id: "mdm-farah-hasinah-abdul-wahab", name: "Mdm Farah Hasinah Abdul Wahab", formClass: "6D", emoji: "📚" },
+{ id: "mrs-hans-ow", name: "Mrs Hans Ow", formClass: "6E", emoji: "📚" },
+{ id: "mr-goh-shu-rong", name: "Mr Goh Shu Rong", formClass: "6E", emoji: "📐" },
+{ id: "mrs-lee-liu-lai-feng", name: "Mrs Lee-Liu Lai Feng", formClass: "6F", emoji: "📝" },
+{ id: "mrs-katherine-chong", name: "Mrs Katherine Chong", formClass: "6F", emoji: "📚" },
+{ id: "mdm-aishah-abdul-jalil", name: "Mdm Aishah Abdul Jalil", formClass: "", emoji: "✏️" },
+{ id: "mr-michael-long", name: "Mr Michael Long", formClass: "", emoji: "🔬" },
+{ id: "mdm-norlizan-ahmat", name: "Mdm Norlizan Ahmat", formClass: "", emoji: "📖" },
+{ id: "mdm-nur-hafizah-hamir", name: "Mdm Nur Hafizah Hamir", formClass: "", emoji: "🌿" },
+{ id: "mr-a-divian", name: "Mr A Divian", formClass: "", emoji: "🌿" },
+{ id: "ms-ong-ban-teng", name: "Ms Ong Ban Teng", formClass: "", emoji: "🌿" },
+{ id: "ms-rachel-chan", name: "Ms Rachel Chan", formClass: "", emoji: "🌿" },
+{ id: "mr-jay-mahardale", name: "Mr Jay Mahardale", formClass: "", emoji: "🌿" },
+{ id: "mr-chong-choong-hian", name: "Mr Chong Choong Hian", formClass: "", emoji: "🌿" },
+{ id: "mrs-gina-cho", name: "Mrs Gina Cho", formClass: "", emoji: "🌿" },
+];
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get('id');
+const teacher = TEACHERS.find(t => t.id === id);
+const content = document.getElementById('pageContent');
+
+function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+if (!teacher) {
+  content.innerHTML = `
+  <div class="not-found">
+    <div style="font-size:4rem">😕</div>
+    <h2>Page not found</h2>
+    <p style="color:var(--sub);margin-bottom:24px">We couldn't find that teacher. Please check the link.</p>
+  </div>`;
+} else {
+  document.title = `${teacher.name}'s Messages 💌`;
+  document.getElementById('topTitle').textContent = teacher.name + ' 💌';
+  content.innerHTML = `
+  <div class="teacher-hero">
+    <div class="teacher-avatar">${teacher.emoji}</div>
+    <div class="teacher-name">${escH(teacher.name)}</div>
+    ${teacher.formClass ? `<div class="teacher-class">Form Class ${escH(teacher.formClass)}</div>` : ''}
+    <div class="teacher-tagline">✨ Here's what your students wrote for you ✨</div>
+    <div class="lock-note">🔒 This link is private — only you can see these messages</div>
+  </div>
+  <div class="stats-bar"><div class="stats-pill" id="statsPill">Loading messages…</div></div>
+  <div class="section-label">💬 Messages for ${escH(teacher.name)}</div>
+  <div class="refresh-row"><button class="refresh-btn" id="refreshBtn" onclick="loadComments()">🔄 Refresh</button></div>
+  <div class="comments-section">
+    <div class="comments-wall" id="commentsWall">
+      <div class="loading-msg">Loading messages… ⏳</div>
+    </div>
+  </div>
+  <div class="footer-note">Made with ❤️ for Teachers' Day — NPS</div>`;
+  loadComments();
+}
+
+let allComments = [];
+
+function updateStats() {
+  const pill = document.getElementById('statsPill');
+  if (!pill) return;
+  const n = allComments.length;
+  pill.innerHTML = n === 0
+    ? `No messages yet`
+    : `<span>${n}</span> message${n === 1 ? '' : 's'} of appreciation 💛`;
+}
+
+async function loadComments() {
+  const wall = document.getElementById('commentsWall');
+  const btn = document.getElementById('refreshBtn');
+  if (!wall) return;
+  if (btn) { btn.disabled = true; btn.textContent = '🔄 Refreshing…'; }
+
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    wall.innerHTML = '<div class="no-comments">No messages yet — connect Google Sheets to start collecting messages! 🌟<br><small style="color:#bbb">(Set up the Google Apps Script backend to load real messages here)</small></div>';
+    allComments = [];
+    updateStats();
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Refresh'; }
+    return;
+  }
+
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=get&teacherId=${teacher.id}`);
+    const data = await res.json();
+    allComments = data.comments || [];
+    wall.innerHTML = '';
+    if (!allComments.length) {
+      wall.innerHTML = '<div class="no-comments">No messages yet — check back soon! 🌟</div>';
+    } else {
+      allComments
+        .slice()
+        .sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0))
+        .forEach(c => addCommentToWall(c));
+    }
+    updateStats();
+  } catch (e) {
+    wall.innerHTML = '<div class="no-comments">Couldn\'t load messages right now. Please try refreshing. 😓</div>';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Refresh'; }
+  }
+}
+
+function addCommentToWall(comment) {
+  const wall = document.getElementById('commentsWall');
+  if (!wall) return;
+  const date = comment.time ? new Date(comment.time).toLocaleDateString('en-SG',{day:'numeric',month:'short',year:'numeric'}) : '';
+  const div = document.createElement('div');
+  div.className = 'comment-bubble';
+  div.innerHTML = `
+    <div class="comment-meta">
+      <div class="comment-author">💛 ${escH(comment.name)}</div>
+      <div class="comment-time">${date}</div>
+    </div>
+    <div class="comment-text">${escH(comment.message)}</div>`;
+  wall.appendChild(div);
+}
+</script>
+</body>
+</html>
